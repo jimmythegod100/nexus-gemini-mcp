@@ -2,6 +2,7 @@ import logging
 import time
 from contextlib import asynccontextmanager
 from datetime import datetime
+from typing import Any, AsyncIterator
 
 from fastapi import FastAPI, HTTPException
 from prometheus_client import Counter, Histogram
@@ -32,7 +33,7 @@ start_time = time.time()
 
 
 @asynccontextmanager
-async def lifespan(app: FastAPI):
+async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     global gemini_client
     gemini_client = GeminiClient()
     logger.info("nexus-gemini-mcp started")
@@ -44,8 +45,10 @@ app = FastAPI(title="NEXUS Gemini MCP Server", version="0.1.0", lifespan=lifespa
 
 
 @app.post("/tools/generate_video")
-async def generate_video(req: VideoGenerationRequest):
+async def generate_video(req: VideoGenerationRequest) -> VideoGenerationResponse:
     try:
+        if gemini_client is None:
+            raise HTTPException(status_code=503, detail="Gemini client not ready")
         video_generations.inc()
         with generation_duration.time():
             result = await gemini_client.generate_video(
@@ -67,8 +70,10 @@ async def generate_video(req: VideoGenerationRequest):
 
 
 @app.get("/tools/check_status")
-async def check_status(job_id: str):
+async def check_status(job_id: str) -> JobStatusResponse:
     try:
+        if gemini_client is None:
+            raise HTTPException(status_code=503, detail="Gemini client not ready")
         result = await gemini_client.check_generation_status(job_id)
         now = datetime.now()
         return JobStatusResponse(
@@ -84,8 +89,10 @@ async def check_status(job_id: str):
 
 
 @app.get("/tools/retrieve_video")
-async def retrieve_video(job_id: str):
+async def retrieve_video(job_id: str) -> VideoRetrievalResponse:
     try:
+        if gemini_client is None:
+            raise HTTPException(status_code=503, detail="Gemini client not ready")
         result = await gemini_client.retrieve_video(job_id)
         now = datetime.now()
         return VideoRetrievalResponse(
@@ -103,7 +110,7 @@ async def retrieve_video(job_id: str):
 
 
 @app.get("/health")
-async def health_check():
+async def health_check() -> HealthCheckResponse:
     uptime = int(time.time() - start_time)
     return HealthCheckResponse(
         status="healthy",
@@ -116,12 +123,12 @@ async def health_check():
 
 
 @app.get("/mcp/tools")
-async def list_mcp_tools():
+async def list_mcp_tools() -> dict[str, Any]:
     return {"tools": [tool.model_dump() for tool in MCP_TOOLS]}
 
 
 @app.get("/")
-async def root():
+async def root() -> dict[str, Any]:
     return {
         "service": "nexus-gemini-mcp",
         "version": "0.1.0",

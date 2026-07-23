@@ -1,3 +1,4 @@
+from typing import Any
 import logging
 import time
 
@@ -19,7 +20,7 @@ class GeminiClient:
         genai.configure(api_key=self.api_key)
 
     @backoff.on_exception(backoff.expo, Exception, max_tries=3, jitter=backoff.full_jitter)
-    async def generate_video(self, prompt: str, duration: int, style: str, format: str) -> dict:
+    async def generate_video(self, prompt: str, duration: int, style: str, format: str) -> dict[str, Any]:
         try:
             logger.info("Generating video: %s", prompt[:50])
             job_id = f"job_{duration}_{style}_{int(time.time())}"
@@ -35,7 +36,7 @@ class GeminiClient:
             logger.error("Gemini API error: %s", str(e))
             raise
 
-    async def check_generation_status(self, job_id: str) -> dict:
+    async def check_generation_status(self, job_id: str) -> dict[str, Any]:
         logger.info("Checking status for job: %s", job_id)
         return {
             "job_id": job_id,
@@ -43,7 +44,7 @@ class GeminiClient:
             "progress": 50,
         }
 
-    async def retrieve_video(self, job_id: str) -> dict:
+    async def retrieve_video(self, job_id: str) -> dict[str, Any]:
         logger.info("Retrieving video for job: %s", job_id)
         return {
             "job_id": job_id,

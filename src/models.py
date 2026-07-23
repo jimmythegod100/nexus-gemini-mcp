@@ -1,7 +1,7 @@
 import uuid
 from datetime import datetime
 from enum import Enum
-from typing import Optional
+from typing import Any, Optional
 
 from pydantic import BaseModel, Field
 
@@ -53,14 +53,14 @@ class VideoRetrievalResponse(BaseModel):
     format: Optional[str] = None
     created_at: datetime
     completed_at: Optional[datetime] = None
-    metadata: dict = {}
+    metadata: dict[str, Any] = {}
 
 
 class MCPToolDefinition(BaseModel):
     name: str
     description: str
-    input_schema: dict
-    output_schema: dict
+    input_schema: dict[str, Any]
+    output_schema: dict[str, Any]
 
 
 class HealthCheckResponse(BaseModel):
