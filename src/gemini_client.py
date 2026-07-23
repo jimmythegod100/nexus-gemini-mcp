@@ -1,6 +1,6 @@
-from typing import Any
 import logging
 import time
+from typing import Any
 
 import backoff
 import google.generativeai as genai
@@ -20,7 +20,9 @@ class GeminiClient:
         genai.configure(api_key=self.api_key)
 
     @backoff.on_exception(backoff.expo, Exception, max_tries=3, jitter=backoff.full_jitter)
-    async def generate_video(self, prompt: str, duration: int, style: str, format: str) -> dict[str, Any]:
+    async def generate_video(
+        self, prompt: str, duration: int, style: str, format: str
+    ) -> dict[str, Any]:
         try:
             logger.info("Generating video: %s", prompt[:50])
             job_id = f"job_{duration}_{style}_{int(time.time())}"
