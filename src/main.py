@@ -149,7 +149,7 @@ def run() -> None:
     settings = get_settings()
     uvicorn.run(
         app,
-        host="0.0.0.0",
+        host="0.0.0.0",  # nosec B104 — intentional container bind
         port=settings.SERVICE_PORT,
         log_level=settings.LOG_LEVEL.lower(),
     )
