@@ -1,14 +1,14 @@
 import os
+from unittest.mock import AsyncMock, patch
 
 import pytest
 from fastapi.testclient import TestClient
-from unittest.mock import AsyncMock, patch
 
 os.environ.setdefault("GEMINI_API_KEY", "test-key")
 os.environ.setdefault("DATABASE_URL", "postgresql://nexus_user:nexus_password@localhost:5432/nexus")
 os.environ.setdefault("REDIS_URL", "redis://localhost:6379/0")
 
-from src.main import app
+from src.main import app  # noqa: E402
 
 
 @pytest.fixture

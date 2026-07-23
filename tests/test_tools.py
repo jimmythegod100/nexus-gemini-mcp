@@ -14,6 +14,6 @@ def test_get_tool_by_name():
 def test_get_tool_by_name_invalid():
     try:
         get_tool_by_name("nonexistent")
-        assert False, "Expected ValueError"
+        raise AssertionError("Expected ValueError")
     except ValueError as e:
         assert "nonexistent" in str(e)

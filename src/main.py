@@ -21,7 +21,10 @@ logger = logging.getLogger(__name__)
 setup_logging()
 
 video_generations = Counter("nexus_video_generations_total", "Total video generation requests")
-generation_duration = Histogram("nexus_video_generation_duration_seconds", "Video generation duration")
+generation_duration = Histogram(
+    "nexus_video_generation_duration_seconds",
+    "Video generation duration",
+)
 generation_errors = Counter("nexus_video_generation_errors_total", "Total video generation errors")
 
 gemini_client: GeminiClient | None = None
